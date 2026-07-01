@@ -2,6 +2,7 @@ package com.taskmanager.service;
 
 import com.taskmanager.dto.CreateTaskRequest;
 import com.taskmanager.dto.TaskDTO;
+import com.taskmanager.exception.ResourceNotFoundException;
 import com.taskmanager.model.Task;
 import com.taskmanager.model.User;
 import com.taskmanager.repository.TaskRepository;
@@ -27,18 +28,18 @@ public class TaskService {
 
     public TaskDTO getTaskById(Long id) {
         Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Task not found with id: " + id));
+                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
         return toDTO(task);
     }
 
     public TaskDTO createTask(CreateTaskRequest request) {
         User createdBy = userRepository.findById(request.getCreatedById())
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + request.getCreatedById()));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + request.getCreatedById()));
 
         User assignedTo = null;
         if (request.getAssignedToId() != null) {
             assignedTo = userRepository.findById(request.getAssignedToId())
-                    .orElseThrow(() -> new RuntimeException("User not found with id: " + request.getAssignedToId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + request.getAssignedToId()));
         }
 
         Task task = Task.builder()

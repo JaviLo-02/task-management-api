@@ -2,6 +2,8 @@ package com.taskmanager.service;
 
 import com.taskmanager.dto.CreateUserRequest;
 import com.taskmanager.dto.UserDTO;
+import com.taskmanager.exception.DuplicateResourceException;
+import com.taskmanager.exception.ResourceNotFoundException;
 import com.taskmanager.model.User;
 import com.taskmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,16 +24,16 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public UserDTO getUserById(Long id) {
+   public UserDTO getUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
         return toDTO(user);
     }
 
     public UserDTO createUser(CreateUserRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already in use: " + request.getEmail());
-        }
+    if (userRepository.existsByEmail(request.getEmail())) {
+        throw new DuplicateResourceException("Email already in use: " + request.getEmail());
+    }
         User user = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
